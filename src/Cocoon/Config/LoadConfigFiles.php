@@ -3,6 +3,7 @@
 namespace Cocoon\Config;
 
 use Symfony\Component\Finder\Finder;
+
 /**
  * class qui charge les fichiers de configuration
  *
@@ -28,5 +29,4 @@ class LoadConfigFiles
         }
         return $items;
     }
-    
 }
