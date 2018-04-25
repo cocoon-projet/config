@@ -11,7 +11,7 @@ class CocoonConfigTest extends TestCase
 
     public function setUp()
     {
-        $this->items = LoadConfigFiles::load(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'config');
+        $this->items = LoadConfigFiles::load(__DIR__ . DIRECTORY_SEPARATOR . 'config');
         $this->config = Config::getInstance($this->items);
     }
 
