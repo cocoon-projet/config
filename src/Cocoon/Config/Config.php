@@ -54,14 +54,6 @@ class Config
     }
 
     /**
-     *
-     * On interdit le clonage
-     */
-    private function __clone()
-    {
-    }
-
-    /**
      * Retourne une valeur de configuration (dot  notation)
      *
      * @param $key
