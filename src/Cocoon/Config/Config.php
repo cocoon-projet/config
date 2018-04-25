@@ -12,13 +12,13 @@ namespace Cocoon\Config;
 class Config
 {
     /**
-     * Enregistre le fichier de configuration
+     * Valeurs des fichiers de configuration
      *
      * @var array
      */
     private $items = [];
     /**
-     * Cache les données du fichier de configuration
+     * Cache les données d'une valeur d'un fichier de configuration
      *
      * @var array
      */
