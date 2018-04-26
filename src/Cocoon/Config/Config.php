@@ -2,6 +2,7 @@
 
 namespace Cocoon\Config;
 
+
 /**
  * class qui retourne les valeurs des fichiers de configuration
  * au format: dot notation
@@ -52,7 +53,15 @@ class Config
         }
         return self::$instances;
     }
-
+    /**
+     * On interdit le clonage
+     *
+     * @return LogicException::class
+     */
+    public function __clone()
+    {
+        throw new \LogicException('La classe Config ne peut pas etre clonee !');
+    }
     /**
      * Retourne une valeur de configuration (dot  notation)
      *

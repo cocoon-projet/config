@@ -19,7 +19,7 @@ class LoadConfigFiles
      * @param string $path
      * @return array items des fichiers de configuration
      */
-    public static function load($path, $cache = false) :array
+    public static function load($path) :array
     {
         $items = [];
         $files = Finder::create()->files()->name('*.php')->in($path)->depth(0);

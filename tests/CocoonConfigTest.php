@@ -35,11 +35,16 @@ class CocoonConfigTest extends TestCase
     {
         $this->assertEquals('http://localhost', $this->config->get('app.url'));
         $this->assertEquals('cocoon', $this->config->get('database.mysql.db'));
-        $this->assertEquals('http://localhost', $this->config->get('app.url'));
     }
 
     public function testIfKeyDoesNotExistReturnNull()
     {
         $this->assertNull($this->config->get('app.none'));
+    }
+
+    public function testNotCloneConfigClass()
+    {
+        $this->expectException(\LogicException::class);
+        clone $this->config;
     }
 }
