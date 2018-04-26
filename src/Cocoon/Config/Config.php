@@ -2,7 +2,6 @@
 
 namespace Cocoon\Config;
 
-
 /**
  * class qui retourne les valeurs des fichiers de configuration
  * au format: dot notation
