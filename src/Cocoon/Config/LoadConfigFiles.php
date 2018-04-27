@@ -5,7 +5,8 @@ namespace Cocoon\Config;
 use Symfony\Component\Finder\Finder;
 
 /**
- * class qui charge les fichiers de configuration
+ * Classe qui charge les fichiers de configuration et retourne
+ * toutes les paramètres dans un tableau php
  *
  * Class LoadConfigFiles
  * @package Cocoon\Config
@@ -14,10 +15,10 @@ class LoadConfigFiles
 {
     /**
      * Enregistre les fichiers de configuration et retourne
-     * tous les items des fichiers.
+     * tous les paramètres des fichiers dans un tableau php.
      *
      * @param string $path
-     * @return array items des fichiers de configuration
+     * @return array paramètres des fichiers de configuration
      */
     public static function load($path) :array
     {

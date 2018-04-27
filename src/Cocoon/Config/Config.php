@@ -3,7 +3,7 @@
 namespace Cocoon\Config;
 
 /**
- * class qui retourne les valeurs des fichiers de configuration
+ * class qui retourne les valeurs des paramètres des fichiers de configuration
  * au format: dot notation
  *
  * Class Config
@@ -18,7 +18,7 @@ class Config
      */
     private $items = [];
     /**
-     * Cache les données d'une valeur d'un fichier de configuration
+     * Cache les données d'un paramètre d'un fichier de configuration
      *
      * @var array
      */
@@ -63,6 +63,10 @@ class Config
     }
     /**
      * Retourne une valeur de configuration (dot  notation)
+     * <code>
+     * // filename.key1.key2
+     * $config->get('database.mysql.dsn');
+     * </code>
      *
      * @param $key
      * @param null $default
