@@ -2,7 +2,7 @@
 
 ## introduction
 
-cocoon-projet/config est une librairie php qui mappe plusieurs fichiers de configuration pour stocker les paramètres dans un unique tableau php. les paramètres sont retournés au format: dot notation ex: ` $config->get('app.url'); ` pour un fichier php nommé app.php contenant le tableau ` return [ 'url' => "http://www.monsite.com']`
+cocoon-projet/config est une librairie php qui mappe plusieurs fichiers de configuration pour stocker les paramètres dans un unique tableau php. les paramètres sont retournés au format: dot notation ex: ` $config->get('app.url'); ` pour un fichier php nommé app.php contenant le tableau ` return [ 'url' => 'http://www.monsite.com']`
 
 ## Pré-requis
 
