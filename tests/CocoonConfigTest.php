@@ -9,7 +9,7 @@ class CocoonConfigTest extends TestCase
     private $config;
     private $items;
 
-    public function setUp()
+    protected function setUp() :void
     {
         $this->items = LoadConfigFiles::load(__DIR__ . DIRECTORY_SEPARATOR . 'config');
         $this->config = Config::getInstance($this->items);

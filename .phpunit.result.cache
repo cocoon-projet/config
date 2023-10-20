@@ -1,0 +1,1 @@
+{"version":1,"defects":[],"times":{"CocoonConfigTest::testItemsIsArray":0.012,"CocoonConfigTest::testIfKeyConfigExist":0.002,"CocoonConfigTest::testIsArrayAllConfigItems":0.002,"CocoonConfigTest::testGetConfigKey":0.002,"CocoonConfigTest::testIfKeyDoesNotExistReturnNull":0.002,"CocoonConfigTest::testNotCloneConfigClass":0.002}}
