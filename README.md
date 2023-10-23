@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/cocoon-projet/di.svg?branch=master)](https://travis-ci.org/cocoon-projet/di) [![Coverage Status](https://coveralls.io/repos/github/cocoon-projet/config/badge.svg?branch=master)](https://coveralls.io/github/cocoon-projet/config?branch=master)
+[![codecov](https://codecov.io/gh/cocoon-projet/config/graph/badge.svg?token=KM7Y127Z7J)](https://codecov.io/gh/cocoon-projet/config) [![PHP Composer](https://github.com/cocoon-projet/config/actions/workflows/ci.yml/badge.svg)](https://github.com/cocoon-projet/config/actions/workflows/ci.yml)
 
 ## introduction
 
