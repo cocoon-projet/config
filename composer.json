@@ -1,28 +1,46 @@
 {
     "name": "cocoon-projet/config",
+    "description": "Gestionnaire de configuration pour PHP 8+",
     "type": "library",
-    "description": "Lit les valeurs de multiple fichiers de configuration",
-    "keywords": ["config", "configuration", "file", "files"],
-    "homepage": "https://github.com/cocoon-projet/config/blob/master/docs/README.md",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Cocoon Projet",
+            "email": "contact@cocoon-projet.fr"
+        }
+    ],
     "require": {
         "php": "^8.0",
-        "symfony/finder": "^3.4"
+        "ext-json": "*",
+        "ext-yaml": "*",
+        "symfony/finder": "^3.4",
+        "tracy/tracy": "^2.10"
     },
     "require-dev": {
-        "squizlabs/php_codesniffer": "3.*",
-        "phpunit/phpunit": "^9",
+        "phpunit/phpunit": "^10.0",
+        "phpstan/phpstan": "^1.10",
+        "squizlabs/php_codesniffer": "^3.7",
+        "phpstan/phpstan-strict-rules": "^1.5",
         "php-coveralls/php-coveralls": "^2.0"
     },
     "autoload": {
         "psr-4": {
-            "Cocoon\\": "src/Cocoon/"
+            "Cocoon\\Config\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Cocoon\\Config\\Tests\\": "tests/"
         }
     },
     "scripts": {
-        "test": ["vendor/bin/phpcbf",
-                "vendor/bin/phpcs",
-                "vendor/bin/phpunit"]
-    }
+        "phpstan": "phpstan analyse src tests",
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
 }
-

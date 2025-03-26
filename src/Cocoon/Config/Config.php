@@ -1,124 +1,129 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Cocoon\Config;
 
+use Cocoon\Config\Contracts\ConfigInterface;
+use Cocoon\Config\Exception\ConfigurationException;
+use LogicException;
+
 /**
- * class qui retourne les valeurs des paramètres des fichiers de configuration
- * au format: dot notation
+ * Configuration manager that returns configuration values using dot notation.
  *
- * Class Config
- * @package Cocoon\Config
+ * Example usage:
+ * ```php
+ * $config->get('database.mysql.host'); // Returns value from database.php['mysql']['host']
+ * ```
  */
-class Config
+final class Config implements ConfigInterface
 {
     /**
-     * Valeurs des fichiers de configuration
-     *
-     * @var array
+     * @var self|null Singleton instance
      */
-    private $items = [];
-    /**
-     * Cache les données d'un paramètre d'un fichier de configuration
-     *
-     * @var array
-     */
-    private $cache = [];
-    /**
-     * instance de la classe Config
-     *
-     * @var object
-     */
-    private static $instances = null;
+    private static ?self $instance = null;
 
     /**
-     * Config constructor.
-     * @param array $items
+     * @param array<string, mixed> $items Configuration values
+     * @param array<string, mixed> $cache Cached configuration values
      */
-    private function __construct($items)
-    {
-        $this->items = $items;
-    }
+    private function __construct(
+        private array $items = [],
+        private array $cache = []
+    ) {}
 
     /**
-     * Retourne une instance de Config::class
+     * Returns a singleton instance of Config class
      *
-     * @param array $items
-     * @return self Config::class instance
+     * @param array<string, mixed> $items Configuration values
+     * @throws ConfigurationException If trying to create multiple instances with different configurations
      */
-    public static function getInstance($items)
+    public static function getInstance(array $items): self
     {
-        if (self::$instances == null) {
-            self::$instances = new self($items);
+        if (self::$instance === null) {
+            self::$instance = new self($items);
+            return self::$instance;
         }
-        return self::$instances;
+
+        if ($items !== self::$instance->items) {
+            throw new ConfigurationException(
+                'Cannot create multiple Config instances with different configurations'
+            );
+        }
+
+        return self::$instance;
     }
+
     /**
-     * On interdit le clonage
+     * Get a configuration value using dot notation
      *
-     * @return LogicException::class
+     * @param string $key Configuration key in dot notation (e.g., 'database.mysql.host')
+     * @param mixed $default Default value if key doesn't exist
+     * @return mixed Configuration value or default if not found
      */
-    public function __clone()
-    {
-        throw new \LogicException('La classe Config ne peut pas etre clonee !');
-    }
-    /**
-     * Retourne une valeur de configuration (dot  notation)
-     * <code>
-     * // filename.key1.key2
-     * $config->get('database.mysql.dsn');
-     * </code>
-     *
-     * @param $key
-     * @param null $default
-     * @return array|mixed|null
-     */
-    public function get($key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         if ($this->hasInCache($key)) {
-            $array = $this->cache[$key];
-        } else {
-            $array = $this->items;
-            $arrs = explode('.', $key);
-            foreach ($arrs as $segment) {
-                if (isset($array[$segment])) {
-                    $array = $array[$segment];
-                } else {
-                    $array = $default;
-                    break;
-                }
-            }
-            $this->cache[$key] = $array;
+            return $this->cache[$key];
         }
+
+        $array = $this->items;
+        $segments = explode('.', $key);
+
+        foreach ($segments as $segment) {
+            if (!is_array($array) || !array_key_exists($segment, $array)) {
+                return $default;
+            }
+            $array = $array[$segment];
+        }
+
+        $this->cache[$key] = $array;
         return $array;
-    }
-    /**
-     * Verifie si une clef de configuration existe.
-     *
-     * @param string $key
-     * @return boolean
-     */
-    public function has($key) :bool
-    {
-        return !is_null($this->get($key));
     }
 
     /**
-     * Verifie si une valeur de configuration est en cache
-     *
-     * @param string $key clef d'une valeur de configuration
-     * @return null ou differrent de null
+     * Check if a configuration key exists
      */
-    protected function hasInCache($key) :bool
+    public function has(string $key): bool
+    {
+        return $this->get($key) !== null;
+    }
+
+    /**
+     * Check if a configuration value is cached
+     */
+    private function hasInCache(string $key): bool
     {
         return isset($this->cache[$key]);
     }
+
     /**
-     * Retourne tous les items des fichiers de configurations
+     * Get all configuration items
      *
-     * @return void
+     * @return array<string, mixed>
      */
-    public function all() :array
+    public function all(): array
     {
         return $this->items;
+    }
+
+    /**
+     * Prevent cloning of singleton instance
+     * 
+     * @throws LogicException
+     */
+    private function __clone()
+    {
+        throw new LogicException('Config instances cannot be cloned');
+    }
+
+    /**
+     * Prevent unserialization of singleton instance
+     * 
+     * @throws LogicException
+     */
+    public function __wakeup()
+    {
+        throw new LogicException('Config instances cannot be unserialized');
     }
 }

@@ -1,4 +1,7 @@
 /vendor
 /.idea
 /.vscode
+/cache
+/config
 composer.lock
+index.php
