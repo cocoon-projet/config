@@ -9,7 +9,7 @@ namespace Cocoon\Config\Environment;
  */
 final class Environment
 {
-    private const DEFAULT_ENV = 'production';
+    private const DEFAULT_ENV = 'development';
     
     /**
      * @var string Current environment
@@ -21,11 +21,13 @@ final class Environment
      */
     public static function init(?string $env = null): void
     {
-        self::$currentEnv = $env 
-            ?? $_ENV['APP_ENV'] 
-            ?? $_SERVER['APP_ENV'] 
-            ?? getenv('APP_ENV') 
-            ?? self::DEFAULT_ENV;
+        if ($env !== null) {
+            self::$currentEnv = $env;
+            return;
+        }
+
+        $envVar = $_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? getenv('APP_ENV');
+        self::$currentEnv = $envVar !== false ? $envVar : self::DEFAULT_ENV;
     }
 
     /**
@@ -66,5 +68,13 @@ final class Environment
     public static function isTesting(): bool
     {
         return self::is('testing') || self::is('test');
+    }
+
+    /**
+     * Reset environment to default value
+     */
+    public static function reset(): void
+    {
+        self::$currentEnv = self::DEFAULT_ENV;
     }
 } 

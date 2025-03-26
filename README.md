@@ -2,7 +2,7 @@
 
 ## Introduction
 
-cocoon-projet/config est une librairie PHP moderne qui permet de gérer les configurations de votre application de manière flexible et sécurisée. Elle supporte plusieurs environnements (development, production, testing) et offre des fonctionnalités avancées comme le cache, la validation et l'historique des modifications.
+cocoon-projet/config est une librairie PHP moderne qui permet de gérer les configurations de votre application de manière flexible et sécurisée. Elle supporte plusieurs environnements (development, production, testing) et offre des fonctionnalités avancées comme le cache, la validation.
 
 ## Pré-requis
 
@@ -14,15 +14,6 @@ cocoon-projet/config est une librairie PHP moderne qui permet de gérer les conf
 Via Composer :
 ```bash
 composer require cocoon-projet/config
-```
-
-Insertion dans votre composer.json :
-```json
-{
-    "require": {
-        "cocoon-projet/config": "^1.0"
-    }
-}
 ```
 
 ## Fonctionnalités
@@ -87,38 +78,103 @@ require 'vendor/autoload.php';
 
 use Cocoon\Config\Environment\Environment;
 use Cocoon\Config\Factory\ConfigFactory;
-use Cocoon\Config\Cache\FileCache;
 
 // Initialiser l'environnement
 Environment::init('development');
 
-// Créer une instance du cache (optionnel)
-$cache = new FileCache(__DIR__ . '/cache');
-
-// Charger les configurations
-$config = ConfigFactory::fromDirectory(__DIR__ . '/config', $cache);
+// Charger les configurations depuis un répertoire
+$config = ConfigFactory::fromDirectory(__DIR__ . '/config');
 
 // Utiliser la configuration
 $url = $config->get('app.url');
 $debug = $config->get('app.debug');
+
+// Réinitialiser l'environnement si nécessaire
+Environment::reset(); // Retourne à l'environnement par défaut ('development')
+
+// Vous pouvez aussi créer une configuration directement à partir d'un tableau
+$config = ConfigFactory::fromArray([
+    'app' => [
+        'url' => 'http://www.monsite.com',
+        'debug' => true,
+        'timezone' => 'Europe/Paris'
+    ],
+    'database' => [
+        'host' => 'localhost',
+        'name' => 'ma_base',
+        'user' => 'utilisateur'
+    ]
+]);
 ```
 
 ### Gestion du cache
 
-Le cache est recommandé en production pour optimiser les performances :
+La bibliothèque propose deux systèmes de cache complémentaires :
+
+#### 1. Cache de configuration (ConfigurationCache)
+
+Optimisé pour la gestion des fichiers de configuration en production :
 
 ```php
-use Cocoon\Config\Cache\FileCache;
+use Cocoon\Config\Cache\ConfigurationCache;
 
-// Créer une instance du cache
-$cache = new FileCache(__DIR__ . '/cache');
+// Vérifier si le cache est valide
+if (ConfigurationCache::isFresh($configDir)) {
+    $config = ConfigurationCache::load();
+} else {
+    $config = ConfigFactory::fromDirectory($configDir);
+    ConfigurationCache::save($config->all());
+}
+
+// Vider le cache si nécessaire
+ConfigurationCache::clear();
+```
+
+#### 2. Cache générique (GenericFileCache)
+
+Pour un cache plus flexible et générique :
+
+```php
+use Cocoon\Config\Cache\GenericFileCache;
+use Cocoon\Config\Factory\ConfigFactory;
+use Cocoon\Config\Config;
+
+// Initialiser le cache
+$cache = new GenericFileCache(__DIR__ . '/cache');
 
 // Utiliser le cache avec la factory
 $config = ConfigFactory::fromDirectory(__DIR__ . '/config', $cache);
 
-// Vider le cache si nécessaire
+// Créer une configuration manuellement
+$config = new Config([
+    'app' => [
+        'url' => 'http://www.monsite.com',
+        'debug' => true
+    ]
+]);
+
+// Opérations de cache manuelles
+$cache->set('ma_cle', $valeur);
+$valeur = $cache->get('ma_cle');
+$cache->delete('ma_cle');
 $cache->clear();
 ```
+
+### Bonnes pratiques de cache
+
+1. **En production**
+   - Utilisez `ConfigurationCache` pour les performances optimales
+   - Activez le cache en production uniquement
+   - Videz le cache lors des déploiements
+
+2. **En développement**
+   - Désactivez le cache pour voir les changements en temps réel
+   - Utilisez `GenericFileCache` pour des tests de performance
+
+3. **Sécurité**
+   - Placez le dossier de cache hors de la racine web
+   - Définissez les bonnes permissions sur le dossier
+   - Ne stockez pas d'informations sensibles dans le cache
 
 ### Validation des données
 

@@ -19,40 +19,13 @@ use LogicException;
 final class Config implements ConfigInterface
 {
     /**
-     * @var self|null Singleton instance
-     */
-    private static ?self $instance = null;
-
-    /**
      * @param array<string, mixed> $items Configuration values
      * @param array<string, mixed> $cache Cached configuration values
      */
-    private function __construct(
+    public function __construct(
         private array $items = [],
         private array $cache = []
     ) {}
-
-    /**
-     * Returns a singleton instance of Config class
-     *
-     * @param array<string, mixed> $items Configuration values
-     * @throws ConfigurationException If trying to create multiple instances with different configurations
-     */
-    public static function getInstance(array $items): self
-    {
-        if (self::$instance === null) {
-            self::$instance = new self($items);
-            return self::$instance;
-        }
-
-        if ($items !== self::$instance->items) {
-            throw new ConfigurationException(
-                'Cannot create multiple Config instances with different configurations'
-            );
-        }
-
-        return self::$instance;
-    }
 
     /**
      * Get a configuration value using dot notation
@@ -82,6 +55,60 @@ final class Config implements ConfigInterface
     }
 
     /**
+     * Set a configuration value using dot notation
+     *
+     * @param string $key Configuration key in dot notation (e.g., 'database.mysql.host')
+     * @param mixed $value Value to set
+     */
+    public function set(string $key, mixed $value): void
+    {
+        $keys = explode('.', $key);
+        $current = &$this->items;
+
+        foreach ($keys as $k) {
+            if (!isset($current[$k])) {
+                $current[$k] = [];
+            }
+            $current = &$current[$k];
+        }
+
+        $current = $value;
+        unset($this->cache[$key]);
+    }
+
+    /**
+     * Delete a configuration value using dot notation
+     *
+     * @param string $key Configuration key in dot notation (e.g., 'database.mysql.host')
+     */
+    public function delete(string $key): void
+    {
+        $keys = explode('.', $key);
+        $current = &$this->items;
+
+        foreach ($keys as $i => $k) {
+            if (!isset($current[$k])) {
+                return;
+            }
+            if ($i === count($keys) - 1) {
+                unset($current[$k]);
+                unset($this->cache[$key]);
+                return;
+            }
+            $current = &$current[$k];
+        }
+    }
+
+    /**
+     * Clear all configuration values
+     */
+    public function clear(): void
+    {
+        $this->items = [];
+        $this->cache = [];
+    }
+
+    /**
      * Check if a configuration key exists
      */
     public function has(string $key): bool
@@ -108,22 +135,42 @@ final class Config implements ConfigInterface
     }
 
     /**
-     * Prevent cloning of singleton instance
-     * 
-     * @throws LogicException
+     * Check if a configuration value is a string
      */
-    private function __clone()
+    public function isString(string $key): bool
     {
-        throw new LogicException('Config instances cannot be cloned');
+        return is_string($this->get($key));
     }
 
     /**
-     * Prevent unserialization of singleton instance
-     * 
-     * @throws LogicException
+     * Check if a configuration value is an integer
      */
-    public function __wakeup()
+    public function isInt(string $key): bool
     {
-        throw new LogicException('Config instances cannot be unserialized');
+        return is_int($this->get($key));
+    }
+
+    /**
+     * Check if a configuration value is a boolean
+     */
+    public function isBool(string $key): bool
+    {
+        return is_bool($this->get($key));
+    }
+
+    /**
+     * Check if a configuration value is an array
+     */
+    public function isArray(string $key): bool
+    {
+        return is_array($this->get($key));
+    }
+
+    /**
+     * Check if a configuration value is null
+     */
+    public function isNull(string $key): bool
+    {
+        return $this->get($key) === null;
     }
 }

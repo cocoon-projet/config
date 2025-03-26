@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Cocoon\Config\Tests\Config;
 
-use Cocoon\Config\Config\Config;
+use Cocoon\Config\Config;
 use PHPUnit\Framework\TestCase;
 
 class ConfigManagerTest extends TestCase

@@ -1,14 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Cocoon\Config\Cache;
 
-class FileCache
+/**
+ * Generic file-based cache implementation
+ */
+class GenericFileCache
 {
     private string $cacheDir;
 
     public function __construct(string $cacheDir)
     {
         $this->cacheDir = $cacheDir;
+        
+        if (!is_dir($cacheDir) && !mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
+            throw new \RuntimeException(
+                sprintf('Cache directory "%s" could not be created', $cacheDir)
+            );
+        }
     }
 
     public function get(string $key): mixed

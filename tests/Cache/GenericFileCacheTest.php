@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Cocoon\Config\Tests\Cache;
 
-use Cocoon\Config\Cache\FileCache;
+use Cocoon\Config\Cache\GenericFileCache;
 use PHPUnit\Framework\TestCase;
 
-class FileCacheTest extends TestCase
+class GenericFileCacheTest extends TestCase
 {
     private string $cacheDir;
-    private FileCache $cache;
+    private GenericFileCache $cache;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->cacheDir = sys_get_temp_dir() . '/cocoon-config-test-' . uniqid();
         mkdir($this->cacheDir);
-        $this->cache = new FileCache($this->cacheDir);
+        $this->cache = new GenericFileCache($this->cacheDir);
     }
 
     protected function tearDown(): void

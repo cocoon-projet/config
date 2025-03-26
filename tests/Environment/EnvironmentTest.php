@@ -23,6 +23,8 @@ class EnvironmentTest extends TestCase
 
     public function testDefaultEnvironmentIsDevelopment(): void
     {
+        unset($_ENV['APP_ENV'], $_SERVER['APP_ENV']);
+        putenv('APP_ENV');
         Environment::init();
         $this->assertEquals('development', Environment::current());
     }

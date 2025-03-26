@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Cocoon\Config\Tests\Factory;
 
 use Cocoon\Config\Factory\ConfigFactory;
-use Cocoon\Config\Cache\FileCache;
+use Cocoon\Config\Cache\GenericFileCache;
 use Cocoon\Config\Environment\Environment;
 use PHPUnit\Framework\TestCase;
 
@@ -46,7 +46,7 @@ class ConfigFactoryTest extends TestCase
 
     public function testFromDirectoryWithCache(): void
     {
-        $cache = new FileCache($this->cacheDir);
+        $cache = new GenericFileCache($this->cacheDir);
         $config = ConfigFactory::fromDirectory($this->configDir, $cache);
         
         $this->assertEquals('http://example.com', $config->get('app.url'));
