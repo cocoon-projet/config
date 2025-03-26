@@ -8,7 +8,6 @@ cocoon-projet/config est une librairie PHP moderne qui permet de gérer les conf
 
 - PHP 8.0 ou supérieur
 - Composer
-- Extensions PHP : json, yaml (optionnel)
 
 ## Installation
 
@@ -29,13 +28,13 @@ Insertion dans votre composer.json :
 ## Fonctionnalités
 
 - 🔄 Gestion multi-environnements (development, production, testing)
-- 📦 Support des formats PHP, JSON, YAML et INI
+- 📦 Support des fichiers de configuration PHP
 - 🚀 Système de cache intégré pour optimiser les performances
 - 🔒 Validation des données avec des types stricts
 - 📝 Historique des modifications
 - 🎨 Interface web intégrée pour visualiser et gérer les configurations
 - 🔍 Recherche et filtrage des configurations
-- 📤 Export des configurations en différents formats
+- 📤 Export des configurations au format JSON
 - 🔐 Gestion sécurisée des valeurs sensibles
 - 🔄 Support des environnements multiples avec héritage
 
