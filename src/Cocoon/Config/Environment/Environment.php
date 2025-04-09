@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Cocoon\Config\Environment;
 
+use Dotenv\Dotenv;
+use InvalidArgumentException;
+
 /**
- * Environment configuration manager
+ * Gestionnaire d'environnement d'exécution
  */
 final class Environment
 {
@@ -26,8 +29,8 @@ final class Environment
             return;
         }
 
-        $envVar = $_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? getenv('APP_ENV');
-        self::$currentEnv = $envVar !== false ? $envVar : self::DEFAULT_ENV;
+        $envVar = EnvironmentVariables::get('APP_ENV');
+        self::$currentEnv = $envVar !== null ? $envVar : self::DEFAULT_ENV;
     }
 
     /**
@@ -77,4 +80,5 @@ final class Environment
     {
         self::$currentEnv = self::DEFAULT_ENV;
     }
+
 } 

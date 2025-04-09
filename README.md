@@ -1,96 +1,127 @@
 [![codecov](https://codecov.io/gh/cocoon-projet/config/graph/badge.svg?token=KM7Y127Z7J)](https://codecov.io/gh/cocoon-projet/config) [![PHP Composer](https://github.com/cocoon-projet/config/actions/workflows/ci.yml/badge.svg)](https://github.com/cocoon-projet/config/actions/workflows/ci.yml)
 
-## Introduction
+# Cocoon Config
 
-cocoon-projet/config est une librairie PHP moderne qui permet de gérer les configurations de votre application de manière flexible et sécurisée. Elle supporte plusieurs environnements (development, production, testing) et offre des fonctionnalités avancées comme le cache, la validation.
+Une bibliothèque PHP 8+ moderne et flexible pour la gestion de configuration avec support des variables d'environnement.
 
-## Pré-requis
+## Fonctionnalités
 
-- PHP 8.0 ou supérieur
-- Composer
+- ✨ Support PHP 8.0+
+- 🔄 Gestion multi-environnements (development, production, testing)
+- 🌍 Variables d'environnement avec la fonction helper `env()`
+- 📦 Chargement automatique des fichiers de configuration
+- 🔒 Validation des types et des valeurs
 
 ## Installation
 
-Via Composer :
 ```bash
 composer require cocoon-projet/config
 ```
 
-## Fonctionnalités
+## Configuration
 
-- 🔄 Gestion multi-environnements (development, production, testing)
-- 📦 Support des fichiers de configuration PHP
-- 🚀 Système de cache intégré pour optimiser les performances
-- 🔒 Validation des données avec des types stricts
-- 📝 Historique des modifications
-- 🎨 Interface web intégrée pour visualiser et gérer les configurations
-- 🔍 Recherche et filtrage des configurations
-- 📤 Export des configurations au format JSON
-- 🔐 Gestion sécurisée des valeurs sensibles
-- 🔄 Support des environnements multiples avec héritage
+1. Créez un dossier `config` à la racine de votre projet
+2. Ajoutez vos fichiers de configuration PHP :
+
+```php
+// config/database.php
+return [
+    'default' => 'mysql',
+    'mysql' => [
+        'driver' => 'mysql',
+        'host' => env('DB_HOST', 'localhost'),
+        'port' => env('DB_PORT', 3306),
+        'database' => env('DB_NAME', 'database'),
+        'username' => env('DB_USER', 'root'),
+        'password' => env('DB_PASSWORD', ''),
+    ]
+];
+```
+
+3. Créez un fichier `.env` à la racine :
+
+```env
+APP_ENV=development
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=my_database
+DB_USER=root
+DB_PASSWORD=secret
+```
+
+### Gestion des environnements
+
+La librairie supporte nativement la gestion de différents environnements (development, production, testing) via une convention de nommage des fichiers :
+
+```
+config/
+├── database.php           # Configuration par défaut
+├── database.production.php # Configuration spécifique à la production
+├── database.development.php # Configuration spécifique au développement
+└── database.testing.php   # Configuration spécifique aux tests
+```
+
+Le système fonctionne de la manière suivante :
+
+1. **Fichiers spécifiques à l'environnement** :
+   - Format : `nom.environnement.php` (ex: `database.production.php`)
+   - Ces fichiers sont chargés uniquement pour l'environnement correspondant
+   - Ils écrasent les valeurs du fichier de configuration par défaut
+
+2. **Fichiers de configuration par défaut** :
+   - Format : `nom.php` (ex: `database.php`)
+   - Servent de configuration de base
+   - Sont utilisés si aucun fichier spécifique à l'environnement n'existe
+
+
+3. **Exemple de chargement** :
+   ```php
+   // En environnement production
+   $config = ConfigFactory::fromDirectory(__DIR__ . '/config');
+   $dbHost = $config->get('database.mysql.host'); // Valeur de database.production.php ou database.php
+   ```
+
+4. **Priorité de chargement** :
+   - Le fichier spécifique à l'environnement est chargé en priorité
+   - Si non trouvé, le fichier par défaut est utilisé
+   - Les valeurs sont fusionnées de manière récursive
 
 ## Utilisation
 
-### Configuration de base
-
-1. Créez un dossier pour vos fichiers de configuration :
-```
-config/
-  ├── app.php
-  ├── app.production.php
-  ├── database.php
-  └── database.production.php
-```
-
-2. Exemple de fichier de configuration (app.php) :
-```php
-<?php
-
-declare(strict_types=1);
-
-return [
-    'url' => 'http://www.monsite.com',
-    'debug' => true,
-    'timezone' => 'Europe/Paris'
-];
-```
-
-3. Configuration spécifique à l'environnement (app.production.php) :
-```php
-<?php
-
-declare(strict_types=1);
-
-return [
-    'url' => 'https://www.monsite.com',
-    'debug' => false
-];
-```
-
-### Initialisation et utilisation
+### Chargement des variables d'environnement
 
 ```php
-<?php
+use Cocoon\Config\Environment\EnvironmentVariables;
 
-declare(strict_types=1);
+// Charger depuis un fichier .env (indiquer le repertoire) 
+EnvironmentVariables::load(__DIR__);
 
-require 'vendor/autoload.php';
+// Ou charger manuellement
+EnvironmentVariables::set('APP_ENV', 'development');
+// ou
+env('APP_ENV', 'development');
+EnvironmentVariables::set('DB_HOST', 'localhost');
+// ou
+env('DB_HOST', 'localhost');
+```
 
-use Cocoon\Config\Environment\Environment;
+### Chargement de la configuration .env et fichier de configuration
+
+```php
 use Cocoon\Config\Factory\ConfigFactory;
+use Cocoon\Config\Environment\Environment;
+
+// Charger depuis un fichier .env (indiquer le repertoire) 
+EnvironmentVariables::load(__DIR__);
 
 // Initialiser l'environnement
-Environment::init('development');
+Environment::init(EnvironmentVariables::get('APP_ENV', 'development'));
 
-// Charger les configurations depuis un répertoire
+// Charger la configuration
 $config = ConfigFactory::fromDirectory(__DIR__ . '/config');
 
-// Utiliser la configuration
-$url = $config->get('app.url');
-$debug = $config->get('app.debug');
-
-// Réinitialiser l'environnement si nécessaire
-Environment::reset(); // Retourne à l'environnement par défaut ('development')
+// Accéder aux valeurs
+$dbHost = $config->get('database.mysql.host');
 
 // Vous pouvez aussi créer une configuration directement à partir d'un tableau
 $config = ConfigFactory::fromArray([
@@ -106,7 +137,6 @@ $config = ConfigFactory::fromArray([
     ]
 ]);
 ```
-
 ### Gestion du cache
 
 La bibliothèque propose deux systèmes de cache complémentaires :
@@ -160,19 +190,47 @@ $cache->delete('ma_cle');
 $cache->clear();
 ```
 
-### Bonnes pratiques de cache
+### Variables d'environnement
 
-1. **En production**
+```php
+// Récupérer une variable d'environnement
+$dbHost = env('DB_HOST', 'localhost');
+
+// Vérifier l'existence d'une variable
+if (env('DEBUG', false)) {
+    // ...
+}
+```
+
+## Bonnes pratiques
+
+1. **Organisation des fichiers**
+   - Un fichier par domaine (database.php, mail.php, etc.)
+   - Utilisation de sous-tableaux pour organiser les configurations
+   - Documentation des options dans les commentaires
+
+2. **Variables d'environnement**
+   - Toujours fournir des valeurs par défaut
+   - Utiliser des noms explicites et cohérents
+   - Documenter les variables requises
+   - Ne jamais commiter le fichier `.env`
+   - Créer un fichier `.env.example` pour documenter les variables nécessaires
+
+3. **Sécurité**
+   - Ne jamais commiter le fichier `.env`
+   - Utiliser des valeurs sécurisées en production
+   - Valider les entrées utilisateur
+
+4. **En production**
    - Utilisez `ConfigurationCache` pour les performances optimales
    - Activez le cache en production uniquement
    - Videz le cache lors des déploiements
 
-2. **En développement**
+5. **En développement**
    - Désactivez le cache pour voir les changements en temps réel
    - Utilisez `GenericFileCache` pour des tests de performance
 
-3. **Sécurité**
-   - Placez le dossier de cache hors de la racine web
+6. **Sécurité**
    - Définissez les bonnes permissions sur le dossier
    - Ne stockez pas d'informations sensibles dans le cache
 
@@ -207,29 +265,6 @@ if ($config->isArray('database.mysql')) {
 }
 ```
 
-### Interface web
-
-L'interface web intégrée permet de :
-- Visualiser les configurations par environnement
-- Modifier les valeurs en temps réel
-- Exporter les configurations
-- Consulter l'historique des modifications
-
-```php
-// Dans votre index.php
-require 'vendor/autoload.php';
-
-use Cocoon\Config\Environment\Environment;
-use Cocoon\Config\Factory\ConfigFactory;
-
-// Initialiser l'environnement
-$env = $_GET['env'] ?? 'development';
-Environment::init($env);
-
-// Charger les configurations
-$config = ConfigFactory::fromDirectory(__DIR__ . '/config');
-```
-
 ## Licence
 
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+MIT License - voir le fichier [LICENSE](LICENSE) pour plus de détails.
